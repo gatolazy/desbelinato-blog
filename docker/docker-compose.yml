@@ -1,0 +1,51 @@
+version: '3.3'
+services:
+
+  backend:
+    build:
+      context: ../backend/
+      dockerfile: ./.docker/Dockerfile
+    #command: tail -F anything
+    working_dir: /var/www/app
+    #network_mode: "host"
+    volumes:
+      - ../backend:/var/www/app
+    networks:
+      - app_network
+
+
+  frontend:
+    build:
+      context: ../frontend/
+      dockerfile: ./.docker/Dockerfile
+    command: tail -F anything
+    working_dir: /var/www/html
+    #network_mode: "host"
+    volumes:
+      - ../frontend:/var/www/html
+    networks:
+      - app_network
+
+    
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    # restart: unless-stopped
+    # tty: true
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - "37080:80"
+      - "37443:443"
+    volumes:
+      - ../backend/:/var/www/app
+      - ../frontend/:/var/www/html
+      - ../nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - app_network
+
+# Docker Networks
+networks:
+  app_network:
+    driver: bridge
