@@ -1,0 +1,40 @@
+version: '3.3'
+services:
+
+
+  frontend:
+    build:
+      context: ../frontend/
+      dockerfile: ./.docker/Dockerfile
+    command: tail -F anything
+    environment:
+      REACT_APP_BACKEND_API_BASE_URL: https://${EXTERNAL_IP}:37443
+    working_dir: /var/www/html
+    volumes:
+      - ../frontend/development:/var/www/html
+    networks:
+      - app_network
+
+    
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    # restart: unless-stopped
+    # tty: true
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - "37080:80"
+      - "37443:443"
+    volumes:
+      - ../backend/:/var/www/app
+      - ../nginx/conf.development.d/:/etc/nginx/conf.d/
+      - ../nginx/certificate/:/etc/nginx/certificate/
+    networks:
+      - app_network
+
+# Docker Networks
+networks:
+  app_network:
+    driver: bridge
