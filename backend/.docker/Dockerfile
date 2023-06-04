@@ -4,6 +4,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 RUN apt update -y && apt upgrade -y
 RUN apt install zip unzip
+#RUN docker-php-ext-install openssl bcmath curl json mbstring pdo_mysql tokenizer xml zip
+#RUN docker-php-ext-enable openssl bcmath curl json mbstring pdo_mysql tokenizer xml zip
+
+RUN docker-php-ext-install pdo pdo_mysql
+
 
 # Add user for laravel application
 RUN groupadd -g 1000 www
